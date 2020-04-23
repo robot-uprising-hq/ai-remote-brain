@@ -5,11 +5,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Grpc.Core;
-using Braincommunication;
+using Robotsystemcommunication;
 
 namespace MLAgents.Sensor
 {
-    public class BrainServer : MonoBehaviour
+    public class UnityBrainServer : MonoBehaviour
     {
         public RemoteAgent remoteAgent;
 
@@ -29,14 +29,14 @@ namespace MLAgents.Sensor
 
         private void StartServer()
         {
-            BrainCommunicatorImpl brainCommunicatorImpl = new BrainCommunicatorImpl(
+            BrainServerImpl brainServerImpl = new BrainServerImpl(
                 lowerObservationsLength,
-                upperObservationsLength);
-            brainCommunicatorImpl.remoteAgent = remoteAgent;
+                upperObservationsLength,
+                remoteAgent);
             
             server = new Server
                 {
-                    Services = { BrainCommunicator.BindService(brainCommunicatorImpl) },
+                    Services = { BrainServer.BindService(brainServerImpl) },
                     Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
                 };
             server.Start();
@@ -48,25 +48,26 @@ namespace MLAgents.Sensor
             server.ShutdownAsync().Wait();
         }
 
-        class BrainCommunicatorImpl : BrainCommunicator.BrainCommunicatorBase
+        class BrainServerImpl : BrainServer.BrainServerBase
         {
-            public RemoteAgent remoteAgent;
+            private RemoteAgent remoteAgent;
 
             private float[] lowerObservations;
             private float[] upperObservations;
 
-            public BrainCommunicatorImpl(int lowerObservationsLength, int upperObservationsLength) : base()
+            public BrainServerImpl(int lowerObservationsLength, int upperObservationsLength, RemoteAgent remoteAgent) : base()
             {
                 lowerObservations = new float[lowerObservationsLength];
                 upperObservations = new float[upperObservationsLength];
+                this.remoteAgent = remoteAgent;
             }
 
-            public override Task<AgentAction> GetAction(Observations observations, ServerCallContext context)
+            public override Task<BrainActionResponse> GetAction(BrainActionRequest req, ServerCallContext context)
             {
                 var lowerObsList = new List<float>();
-                lowerObsList.AddRange(observations.LowerObservations);
+                lowerObsList.AddRange(req.LowerObservations);
                 var upperObsList = new List<float>();
-                upperObsList.AddRange(observations.UpperObservations);
+                upperObsList.AddRange(req.UpperObservations);
                 
                 // Set observations to remote agent.
                 remoteAgent.SetObservations(lowerObsList.ToArray(), upperObsList.ToArray());
@@ -75,7 +76,7 @@ namespace MLAgents.Sensor
                 int action = remoteAgent.GetDecidedAction();
 
                 // Send remote agents action back.
-                return Task.FromResult(new AgentAction { Action = action });
+                return Task.FromResult(new BrainActionResponse { Action = action });
             }
         }
     }
