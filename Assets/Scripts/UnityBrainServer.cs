@@ -18,7 +18,7 @@ namespace MLAgents.Sensor
         public int upperObservationsLength = 35;
 
         [Space(10)]
-        public int Port = 50051;
+        public int Port = 50052;
 
         private Server server;
 
