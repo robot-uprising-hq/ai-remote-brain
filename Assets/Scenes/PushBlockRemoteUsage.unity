@@ -168,7 +168,7 @@ MonoBehaviour:
   remoteAgent: {fileID: 1699359571}
   lowerObservationsLength: 35
   upperObservationsLength: 35
-  Port: 50051
+  Port: 50052
 --- !u!1 &255077123
 GameObject:
   m_ObjectHideFlags: 0
