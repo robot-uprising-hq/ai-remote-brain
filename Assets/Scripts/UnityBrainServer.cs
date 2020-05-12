@@ -60,7 +60,12 @@ public class UnityBrainServer : MonoBehaviour
             remoteAgent.SetObservations(lowerObsList.ToArray(), upperObsList.ToArray());
             remoteAgent.RequestDecision();
 
-            int action = remoteAgent.GetDecidedAction();
+            int action = -1;
+            while(action < 0)
+            {
+                Thread.Sleep(10); 
+                action = remoteAgent.GetDecidedAction();
+            }
 
             // Send remote agents action back.
             return Task.FromResult(new BrainActionResponse { Action = action });

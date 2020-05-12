@@ -9,9 +9,9 @@ public class RemoteAgent : Agent
 {
     PushBlockSettings m_PushBlockSettings;
 
-    private float[] lowerSensor;
-    private float[] upperSensor;
-    private float action = -1;
+    private volatile float[] lowerSensor;
+    private volatile float[] upperSensor;
+    private volatile float action = -1;
 
     void Awake()
     {
@@ -37,6 +37,7 @@ public class RemoteAgent : Agent
     /// </summary>
     public void SetObservations(float[] lowerObservations, float[] upperObservations)
     {
+        action = -1;
         lowerSensor = lowerObservations;
         upperSensor = upperObservations;
     }
