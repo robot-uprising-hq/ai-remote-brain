@@ -1,12 +1,18 @@
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
 
-namespace MLAgentsExamples
+namespace Unity.MLAgentsExamples
 {
+    /// <summary>
+    /// A helper class for the ML-Agents example scenes to override various
+    /// global settings, and restore them afterwards.
+    /// This can modify some Physics and time-stepping properties, so you
+    /// shouldn't copy it into your project unless you know what you're doing.
+    /// </summary>
     public class ProjectSettingsOverrides : MonoBehaviour
     {
         // Original values
-        float m_OriginalMonitorVerticalOffset;
+
         Vector3 m_OriginalGravity;
         float m_OriginalFixedDeltaTime;
         float m_OriginalMaximumDeltaTime;
@@ -15,9 +21,6 @@ namespace MLAgentsExamples
 
         [Tooltip("Increase or decrease the scene gravity. Use ~3x to make things less floaty")]
         public float gravityMultiplier = 1.0f;
-
-        [Header("Display Settings")]
-        public float monitorVerticalOffset;
 
         [Header("Advanced physics settings")]
         [Tooltip("The interval in seconds at which physics and other fixed frame rate updates (like MonoBehaviour's FixedUpdate) are performed.")]
@@ -32,7 +35,6 @@ namespace MLAgentsExamples
         public void Awake()
         {
             // Save the original values
-            m_OriginalMonitorVerticalOffset = Monitor.verticalOffset;
             m_OriginalGravity = Physics.gravity;
             m_OriginalFixedDeltaTime = Time.fixedDeltaTime;
             m_OriginalMaximumDeltaTime = Time.maximumDeltaTime;
@@ -40,19 +42,18 @@ namespace MLAgentsExamples
             m_OriginalSolverVelocityIterations = Physics.defaultSolverVelocityIterations;
 
             // Override
-            Monitor.verticalOffset = monitorVerticalOffset;
             Physics.gravity *= gravityMultiplier;
             Time.fixedDeltaTime = fixedDeltaTime;
             Time.maximumDeltaTime = maximumDeltaTime;
             Physics.defaultSolverIterations = solverIterations;
             Physics.defaultSolverVelocityIterations = solverVelocityIterations;
 
-            Academy.Instance.FloatProperties.RegisterCallback("gravity", f => { Physics.gravity = new Vector3(0, -f, 0); });
+            // Make sure the Academy singleton is initialized first, since it will create the SideChannels.
+            Academy.Instance.EnvironmentParameters.RegisterCallback("gravity", f => { Physics.gravity = new Vector3(0, -f, 0); });
         }
 
         public void OnDestroy()
         {
-            Monitor.verticalOffset = m_OriginalMonitorVerticalOffset;
             Physics.gravity = m_OriginalGravity;
             Time.fixedDeltaTime = m_OriginalFixedDeltaTime;
             Time.maximumDeltaTime = m_OriginalMaximumDeltaTime;

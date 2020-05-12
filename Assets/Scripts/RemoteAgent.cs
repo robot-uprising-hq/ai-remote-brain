@@ -2,29 +2,32 @@
 
 using System.Collections;
 using UnityEngine;
-using MLAgents;
-using MLAgents.Sensor;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
 
 public class RemoteAgent : Agent
 {
     PushBlockSettings m_PushBlockSettings;
 
-    public RemoteRayPerceptionSensorComponent lowerSensor;
-    public RemoteRayPerceptionSensorComponent upperSensor;
-    public bool useVectorObs;
-
+    private float[] lowerSensor;
+    private float[] upperSensor;
     private float action = -1;
-
 
     void Awake()
     {
         m_PushBlockSettings = FindObjectOfType<PushBlockSettings>();
     }
 
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        sensor.AddObservation(lowerSensor);
+        sensor.AddObservation(upperSensor);
+    }
+
     /// <summary>
     /// Called every step of the engine. Here the agent takes an action.
     /// </summary>
-    public override void AgentAction(float[] vectorAction)
+    public override void OnActionReceived(float[] vectorAction)
     {
         action = vectorAction[0];
     }
@@ -34,8 +37,8 @@ public class RemoteAgent : Agent
     /// </summary>
     public void SetObservations(float[] lowerObservations, float[] upperObservations)
     {
-        lowerSensor.m_RaySensor.SetObservations(lowerObservations);
-        upperSensor.m_RaySensor.SetObservations(upperObservations);
+        lowerSensor = lowerObservations;
+        upperSensor = upperObservations;
     }
 
     /// <summary>

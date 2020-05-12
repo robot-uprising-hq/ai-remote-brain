@@ -42,8 +42,6 @@ GameObject:
   - component: {fileID: 4188187884171146}
   - component: {fileID: 114306175693660464}
   - component: {fileID: 661644466516174824}
-  - component: {fileID: 5244625172823510169}
-  - component: {fileID: 4126291191856783099}
   m_Layer: 0
   m_Name: RemoteAgent
   m_TagString: agent
@@ -78,16 +76,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    vectorObservationSize: 0
-    numStackedVectorObservations: 2
-    vectorActionSize: 07000000
-    vectorActionDescriptions: []
-    vectorActionSpaceType: 0
-  m_Model: {fileID: 5022602860645237092, guid: 04e6e174f84ddb38d87bb775e72ac441, type: 3}
+    VectorObservationSize: 310
+    NumStackedVectorObservations: 3
+    VectorActionSize: 05000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 0
+  m_Model: {fileID: 5022602860645237092, guid: 99da5d92c4b736fa7b5933fb281bb873, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: PushBlock
-  m_TeamID: 0
+  TeamId: 0
   m_UseChildSensors: 1
 --- !u!114 &661644466516174824
 MonoBehaviour:
@@ -104,63 +102,4 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  maxStep: 5000000
-  lowerSensor: {fileID: 5244625172823510169}
-  upperSensor: {fileID: 4126291191856783099}
-  useVectorObs: 1
---- !u!114 &5244625172823510169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1489716781518988}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8af752b199b1878729ea98276cf2617c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sensorName: RayPerceptionSensor
-  detectableTags:
-  - a
-  - b
-  - c
-  raysPerDirection: 3
-  maxRayDegrees: 90
-  sphereCastRadius: 0.5
-  rayLength: 12
-  rayLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967291
-  observationStacks: 3
-  rayHitColor: {r: 1, g: 0, b: 0, a: 1}
-  rayMissColor: {r: 1, g: 1, b: 1, a: 1}
-  useWorldPositions: 1
---- !u!114 &4126291191856783099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1489716781518988}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8af752b199b1878729ea98276cf2617c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sensorName: OffsetRayPerceptionSensor
-  detectableTags:
-  - a
-  - b
-  - c
-  raysPerDirection: 3
-  maxRayDegrees: 90
-  sphereCastRadius: 0.5
-  rayLength: 12
-  rayLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967291
-  observationStacks: 3
-  rayHitColor: {r: 1, g: 0, b: 0, a: 1}
-  rayMissColor: {r: 1, g: 1, b: 1, a: 1}
-  useWorldPositions: 1
+  MaxStep: 5000000

@@ -166,8 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   remoteAgent: {fileID: 1699359571}
-  lowerObservationsLength: 35
-  upperObservationsLength: 35
   Port: 50052
 --- !u!1 &255077123
 GameObject:
@@ -508,7 +506,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityMultiplier: 2.5
-  monitorVerticalOffset: 0
   fixedDeltaTime: 0.02
   maximumDeltaTime: 0.33333334
   solverIterations: 6
@@ -542,8 +539,8 @@ MonoBehaviour:
   agentRunSpeed: 3
   agentRotationSpeed: 15
   spawnAreaMarginMultiplier: 0.5
-  goalScoredMaterial: {fileID: 2100000, guid: df32cc593804f42df97464dc455057b8, type: 2}
-  failMaterial: {fileID: 2100000, guid: a1daf31cdf41e484ca9ac33a5c6f524a, type: 2}
+  goalScoredMaterial: {fileID: 0}
+  failMaterial: {fileID: 0}
 --- !u!114 &1699359571 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 661644466516174824, guid: 03bcc81e249714a22bb411dddcc5d15e,
