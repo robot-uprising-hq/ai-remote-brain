@@ -108,7 +108,8 @@ venv/
 .coverage
 
 # Training results
-results/
+[Aa]ssets/results/
+[Aa]ssets/results.meta
 
 # visual studio
 .vs/
