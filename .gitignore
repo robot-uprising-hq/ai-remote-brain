@@ -11,7 +11,8 @@ Assets/Demonstrations*
 Assets/TFModels*
 Assets/ML-Agents/Timers*
 
-Assets/ML-Agents/Timers
+Assets/BrainFileToUse/*
+!Assets/BrainFileToUse/.gitkeep
 
 # Tensorflow Model Info
 /models
