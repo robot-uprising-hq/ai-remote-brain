@@ -28,4 +28,4 @@ The usage of this repo is shown in the following repos:
 
 # Developing guide
 ## Changes to gRPC messages
-In case you change a gRPC message check [this document](https://github.com/robot-uprising-hq/ai-guide/blob/master/docs/gRPC-code-generation.md)
+In case you change a gRPC message check [this document](https://github.com/robot-uprising-hq/ai-guide/blob/master/docs/Generating-gRPC-code.md)
