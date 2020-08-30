@@ -24,3 +24,8 @@ The usage of this repo is shown in the following repos:
 [AI Simulation](https://github.com/robot-uprising-hq/ai-simulator)
 
 [AI Backend Connector](https://github.com/robot-uprising-hq/ai-backend-connector)
+
+
+# Developing guide
+## Changes to gRPC messages
+In case you change a gRPC message check [this document](https://github.com/robot-uprising-hq/ai-guide/blob/master/docs/gRPC-code-generation.md)
