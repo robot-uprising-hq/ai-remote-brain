@@ -29,11 +29,13 @@ public class BrainFileAutoMount : MonoBehaviour
         if (files.Length > 1)
         {
             m_WarningText.text = "FATAL ERROR: \nFound more than one brain file in folder " + m_BrainFileFolderName;
+            return;
         }
 
         else if (files.Length == 0)
         {
             m_WarningText.text = "FATAL ERROR: \nCould not find a brain file in folder " + m_BrainFileFolderName;
+            return;
         }
 
         m_BehaviorNameOverrides.Clear();
