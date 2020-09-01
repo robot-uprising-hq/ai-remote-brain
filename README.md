@@ -17,6 +17,7 @@ This is repository is based on Unity ML Agents Release 6 and the PushBlock examp
 
 Download and install this repo and its Python dependencies using the installation scripts in [AI Guide repo](https://github.com/robot-uprising-hq/ai-guide)
 
+You can build the project to be an executable. When using the executable create folder structure `Assets/BrainFileToUse` to the root folder of the executable and place the brain file there so that executable finds it.
 
 ## Usage
 The usage of this repo is shown in the following repos:
