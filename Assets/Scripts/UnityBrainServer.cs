@@ -32,7 +32,7 @@ public class UnityBrainServer : MonoBehaviour
                 Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
             };
         server.Start();
-        Debug.Log("Server started");
+        Debug.Log("\n=====\nServer started\n=====\n");
     }
 
     private void StopServer()

@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Unity.Barracuda;
 using Unity.MLAgents.Policies;
 
@@ -23,42 +26,65 @@ public class BrainFileAutoMount : MonoBehaviour
 
     void Awake()
     {
-        DirectoryInfo dir = new DirectoryInfo( m_BrainFileFolderName );
-        FileInfo[] files = dir.GetFiles( "*.nn" );
-
-        if (files.Length > 1)
+        try
         {
-            m_WarningText.text = "FATAL ERROR: \nFound more than one brain file in folder " + m_BrainFileFolderName;
+            DirectoryInfo dir = new DirectoryInfo(m_BrainFileFolderName);
+            FileInfo[] files = dir.GetFiles("*.nn");
+            if (files.Length > 1)
+            {
+                string warningText = "=====\nFATAL ERROR:\nFound more than one brain file in folder '" + m_BrainFileFolderName + "'\n=====";
+                Exit(warningText);
+                return;
+            }
+
+            else if (files.Length == 0)
+            {
+                string warningText = "=====\nFATAL ERROR:\nCould not find a brain file in folder '" + m_BrainFileFolderName + "'\n=====";
+                Exit(warningText);
+                return;
+            }
+
+            m_BehaviorNameOverrides.Clear();
+            m_BehaviorNameOverrides[m_BehaviourName] = m_BrainFileFolderName + "/" + files[0].Name;
+
+            NNModel nnModel = GetModelForBehaviorName(m_BehaviourName);
+            if (nnModel != null)
+            {
+                Debug.Log("No brain file");
+            }
+
+            var name = GetOverrideBehaviorName(m_BehaviourName);
+            Debug.Log("name: " + name);
+
+            m_RemoteAgent.LazyInitialize();
+            // Need to give the sensors some data before setting up a new model
+            // because the process of setting a new model reads the sensors once.
+            float[] lowerObservations = new float[155];
+            float[] upperObservations = new float[155];
+            m_RemoteAgent.SetObservations(lowerObservations, upperObservations);
+            m_RemoteAgent.SetModel(name, nnModel);
+
+            string successText = "=====\nBrain file '" + files[0].Name + "' found and taken into use\n=====";
+            m_WarningText.text = successText;
+            Debug.Log("\n\n" + successText + "\n\n");
+        }
+        catch
+        {
+            string warningText = "=====\nFATAL ERROR:\nFolder '" + m_BrainFileFolderName + "' not found\n=====";
+            Exit(warningText);
             return;
         }
+    }
 
-        else if (files.Length == 0)
+    private void Exit(string warningText)
+    {
+        m_WarningText.text = warningText;
+        // Debug.Log("\n\n" + warningText + "\n\n");
+        if (!Application.isEditor)
         {
-            m_WarningText.text = "FATAL ERROR: \nCould not find a brain file in folder " + m_BrainFileFolderName;
-            return;
+            Debug.Log("\n\n" + warningText + "\n\n");
+            System.Diagnostics.Process.GetCurrentProcess().Kill();
         }
-
-        m_BehaviorNameOverrides.Clear();
-        m_BehaviorNameOverrides[m_BehaviourName] = m_BrainFileFolderName + "/" + files[0].Name;
-
-        NNModel nnModel = GetModelForBehaviorName(m_BehaviourName);
-        if (nnModel != null)
-        {
-            Debug.Log("On file");
-        }
-
-        var name = GetOverrideBehaviorName(m_BehaviourName);
-        Debug.Log("name: " + name);
-
-        m_RemoteAgent.LazyInitialize();
-        // Need to give the sensors some data before setting up a new model
-        // because the process of setting a new model reads the sensors once.
-        float[] lowerObservations = new float[155];
-        float[] upperObservations = new float[155];
-        m_RemoteAgent.SetObservations(lowerObservations, upperObservations);
-        m_RemoteAgent.SetModel(name, nnModel);
-
-        m_WarningText.text = "Brain file '" + files[0].Name + "' found and taken into use";
     }
 
     // Source https://github.com/Unity-Technologies/ml-agents/blob/release_6/Project/Assets/ML-Agents/Examples/SharedAssets/Scripts/ModelOverrider.cs
