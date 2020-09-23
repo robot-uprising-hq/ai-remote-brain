@@ -10,11 +10,11 @@ using UnityEditor;
 using Unity.Barracuda;
 using Unity.MLAgents.Policies;
 
-// This script 
+
+[RequireComponent(typeof(UnityBrainServer))]
 public class BrainFileAutoMount : MonoBehaviour
 {
-    public RemoteAgent m_RemoteAgent;
-    public string m_BehaviourName = "PushBlock";
+    public string m_BehaviourName;
     public string m_BrainFileFolderName = "Assets/BrainFileToUse";
 
     public Text m_WarningText;
@@ -26,6 +26,7 @@ public class BrainFileAutoMount : MonoBehaviour
 
     void Awake()
     {
+        var agents = GetComponent<UnityBrainServer>().m_RemoteAgents;
         try
         {
             DirectoryInfo dir = new DirectoryInfo(m_BrainFileFolderName);
@@ -56,13 +57,16 @@ public class BrainFileAutoMount : MonoBehaviour
             var name = GetOverrideBehaviorName(m_BehaviourName);
             Debug.Log("name: " + name);
 
-            m_RemoteAgent.LazyInitialize();
-            // Need to give the sensors some data before setting up a new model
-            // because the process of setting a new model reads the sensors once.
-            float[] lowerObservations = new float[155];
-            float[] upperObservations = new float[155];
-            m_RemoteAgent.SetObservations(lowerObservations, upperObservations);
-            m_RemoteAgent.SetModel(name, nnModel);
+            foreach (var agent in agents)
+            {
+                agent.LazyInitialize();
+                // Need to give the sensors some data before setting up a new model
+                // because the process of setting a new model reads the sensors once.
+                float[] lowerObservations = new float[155];
+                float[] upperObservations = new float[155];
+                agent.SetObservations(lowerObservations, upperObservations);
+                agent.SetModel(name, nnModel);
+            }
 
             string successText = "=====\nBrain file '" + files[0].Name + "' found and taken into use\n=====";
             m_WarningText.text = successText;

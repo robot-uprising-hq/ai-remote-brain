@@ -10,12 +10,17 @@ using Robotsystemcommunication;
 
 public class UnityBrainServer : MonoBehaviour
 {
-    public RemoteAgent remoteAgent;
+    public List<RemoteAIRobotAgent> m_RemoteAgents = new List<RemoteAIRobotAgent>();
 
     [Space(10)]
     public int Port = 50052;
 
     private Server server;
+
+    void Awake()
+    {
+
+    }
 
     void Start()
     {
@@ -24,7 +29,7 @@ public class UnityBrainServer : MonoBehaviour
 
     private void StartServer()
     {
-        BrainServerImpl brainServerImpl = new BrainServerImpl(remoteAgent);
+        BrainServerImpl brainServerImpl = new BrainServerImpl(ListToDict(m_RemoteAgents));
 
         server = new Server
             {
@@ -40,35 +45,57 @@ public class UnityBrainServer : MonoBehaviour
         server.ShutdownAsync().Wait();
     }
 
+    private Dictionary<int, RemoteAIRobotAgent> ListToDict(List<RemoteAIRobotAgent> agentList)
+    {
+        Dictionary<int, RemoteAIRobotAgent> agentDict = new Dictionary<int, RemoteAIRobotAgent>(); 
+
+        foreach (var agent in agentList)
+        {
+            agentDict.Add(agent.m_ArucoMarkerID, agent);
+        }
+        return agentDict;
+    }
+
     class BrainServerImpl : BrainServer.BrainServerBase
     {
-        private RemoteAgent remoteAgent;
+        private Dictionary<int, RemoteAIRobotAgent> agentDict;
 
-        public BrainServerImpl(RemoteAgent remoteAgent) : base()
+        public BrainServerImpl(Dictionary<int, RemoteAIRobotAgent> agentDict) : base()
         {
-            this.remoteAgent = remoteAgent;
+            this.agentDict = agentDict;
         }
 
         public override Task<BrainActionResponse> GetAction(BrainActionRequest req, ServerCallContext context)
         {
-            var lowerObsList = new List<float>();
-            lowerObsList.AddRange(req.LowerObservations);
-            var upperObsList = new List<float>();
-            upperObsList.AddRange(req.UpperObservations);
-
-            // Set observations to remote agent.
-            remoteAgent.SetObservations(lowerObsList.ToArray(), upperObsList.ToArray());
-            remoteAgent.RequestDecision();
-
-            int action = -1;
-            while(action < 0)
+            foreach (var actionReq in req.Observations)
             {
-                Thread.Sleep(10); 
-                action = remoteAgent.GetDecidedAction();
+                var lowerObsList = new List<float>();
+                lowerObsList.AddRange(actionReq.LowerObservations);
+                var upperObsList = new List<float>();
+                upperObsList.AddRange(actionReq.UpperObservations);
+
+                // Set observations to remote agent.
+                agentDict[actionReq.ArucoMarkerID].SetObservations(lowerObsList.ToArray(), upperObsList.ToArray());
+                agentDict[actionReq.ArucoMarkerID].RequestDecision();
+            }
+
+            var brainActionRes = new BrainActionResponse();
+
+            foreach (KeyValuePair<int, RemoteAIRobotAgent> agent in agentDict)
+            {
+                int action = -1;
+                while(action < 0)
+                {
+                    action = agent.Value.GetDecidedAction();
+                    if (action != -1) break;
+                    Thread.Sleep(3);
+                }
+                var newAction = new RobotAction(){Action = action, ArucoMarkerID = agent.Key};
+                brainActionRes.Actions.Add(newAction);
             }
 
             // Send remote agents action back.
-            return Task.FromResult(new BrainActionResponse { Action = action });
+            return Task.FromResult(brainActionRes);
         }
     }
 }
