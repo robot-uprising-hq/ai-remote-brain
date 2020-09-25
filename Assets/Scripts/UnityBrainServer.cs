@@ -17,11 +17,6 @@ public class UnityBrainServer : MonoBehaviour
 
     private Server server;
 
-    void Awake()
-    {
-
-    }
-
     void Start()
     {
         StartServer();
@@ -67,35 +62,47 @@ public class UnityBrainServer : MonoBehaviour
 
         public override Task<BrainActionResponse> GetAction(BrainActionRequest req, ServerCallContext context)
         {
-            foreach (var actionReq in req.Observations)
-            {
-                var lowerObsList = new List<float>();
-                lowerObsList.AddRange(actionReq.LowerObservations);
-                var upperObsList = new List<float>();
-                upperObsList.AddRange(actionReq.UpperObservations);
-
-                // Set observations to remote agent.
-                agentDict[actionReq.ArucoMarkerID].SetObservations(lowerObsList.ToArray(), upperObsList.ToArray());
-                agentDict[actionReq.ArucoMarkerID].RequestDecision();
-            }
-
-            var brainActionRes = new BrainActionResponse();
-
-            foreach (KeyValuePair<int, RemoteAIRobotAgent> agent in agentDict)
-            {
-                int action = -1;
-                while(action < 0)
+            try
+            {             
+                foreach (var actionReq in req.Observations)
                 {
-                    action = agent.Value.GetDecidedAction();
-                    if (action != -1) break;
-                    Thread.Sleep(3);
+                    var lowerObsList = new List<float>();
+                    lowerObsList.AddRange(actionReq.LowerObservations);
+                    var upperObsList = new List<float>();
+                    upperObsList.AddRange(actionReq.UpperObservations);
+                    // Set observations to remote agent.
+                    agentDict[actionReq.ArucoMarkerID].SetObservations(lowerObsList.ToArray(), upperObsList.ToArray());
+                    agentDict[actionReq.ArucoMarkerID].RequestDecision();
                 }
-                var newAction = new RobotAction(){Action = action, ArucoMarkerID = agent.Key};
-                brainActionRes.Actions.Add(newAction);
-            }
 
-            // Send remote agents action back.
-            return Task.FromResult(brainActionRes);
+                var brainActionRes = new BrainActionResponse();
+                foreach (KeyValuePair<int, RemoteAIRobotAgent> agent in agentDict)
+                {
+                    int action = -1;
+                    while(action < 0)
+                    {
+                        action = agent.Value.GetDecidedAction();
+                        if (action != -1) break;
+                        Thread.Sleep(3);
+                    }
+                    var newAction = new RobotAction(){Action = action, ArucoMarkerID = agent.Key};
+                    brainActionRes.Actions.Add(newAction);
+                }
+
+                // Send remote agents action back.
+                return Task.FromResult(brainActionRes);
+            }
+            catch (Exception error)
+            {
+                Debug.Log(error);
+                var brainActionResFail = new BrainActionResponse();
+                foreach (KeyValuePair<int, RemoteAIRobotAgent> agent in agentDict)
+                {
+                    var newAction = new RobotAction(){Action = 0, ArucoMarkerID = agent.Key};
+                    brainActionResFail.Actions.Add(newAction);
+                }
+                return Task.FromResult(brainActionResFail);
+            }
         }
     }
 }

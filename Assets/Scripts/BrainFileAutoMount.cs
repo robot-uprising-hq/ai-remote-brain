@@ -18,7 +18,7 @@ public class BrainFileAutoMount : MonoBehaviour
     public string m_BrainFileFolderName = "Assets/BrainFileToUse";
 
     public Text m_WarningText;
-    // public string m_BrainFileName = "BrainInUse.nn";
+    public int m_ObservationsPerSensor;
     
     string m_OverrideExtension = "nn";
     Dictionary<string, string> m_BehaviorNameOverrides = new Dictionary<string, string>();
@@ -62,8 +62,8 @@ public class BrainFileAutoMount : MonoBehaviour
                 agent.LazyInitialize();
                 // Need to give the sensors some data before setting up a new model
                 // because the process of setting a new model reads the sensors once.
-                float[] lowerObservations = new float[155];
-                float[] upperObservations = new float[155];
+                float[] lowerObservations = new float[m_ObservationsPerSensor];
+                float[] upperObservations = new float[m_ObservationsPerSensor];
                 agent.SetObservations(lowerObservations, upperObservations);
                 agent.SetModel(name, nnModel);
             }
